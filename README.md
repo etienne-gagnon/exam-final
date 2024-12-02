@@ -4,11 +4,11 @@ Port du serveur : 4040
 
 
 SERVERS
-- server.js : gère les routes entre les views et les API
+- (4040) server.js : gère les routes entre les views et les API
 
 API
-- api-users.js : gère les requetes et reponse de la bd adminitration.users
-- api-messages.js : gère les requetes et reponse de la bd content.messages
+- (4041) api-users.js : gère les requetes et reponse de la bd adminitration.users
+- (4042) api-messages.js : gère les requetes et reponse de la bd content.messages
 
 RESOURCES
 - VIEWS
