@@ -112,6 +112,7 @@ app.get("/api/messages/:id", async (req, res) => {
     try {
         const messageId = req.params.id;
 
+
         const message = await db.collection("messages").findOne({ _id: new ObjectId(messageId) });
 
         if(message) {
@@ -133,7 +134,41 @@ app.get("/api/messages/:id", async (req, res) => {
     }
 });
 
-// Display MES (du user)messages dans page mesMessages.html
+app.post("/api/messages/:id", async (req, res) => {
+    try {
+        const messageId = req.params.id;
+        const { username,  anwser } = req.body;
+
+        
+
+        const newMessage = {
+            messageId,
+            username,
+            anwser,
+            date: new Date()
+        };
+
+        
+        console.log(newMessage);
+
+        const message = await db.collection("anwers").insertOne(newMessage);
+        if(message) {
+            res.status(200).json({
+                success:true,
+                messageId: messageId,
+                username: message.username,
+                anwser: message.anwser,
+                date: message.date,
+            })
+        }else{
+            res.status(400).json({success:false, message:"Message non trouvé pour l'id"});
+        }
+        
+    } catch (error) {
+        res.status(500).json({success:false, message:"Erreur lors du fetch"});
+
+    }
+});
 
 // moddifier messages avec le admin seulement
 

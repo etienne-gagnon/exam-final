@@ -134,12 +134,12 @@ async function getMessages() {
             messageElement.id = message.id;
             messageElement.className = "message";
             messageElement.innerHTML = `
-                <div>
+                <div class="info">
                     <a onclick="fetchMessageById('${message.id}')" >${message.titre}</a>
                     <span>${message.username}</span>
                     <span>${new Date(message.date).toLocaleString()}</span>
                 </div>
-                <div>
+                <div class="message">
                     <span>${message.message}</span>
                 </div>
             `;
@@ -166,19 +166,35 @@ async function fetchMessageById(messageId) {
             return;
         }
 
+
+        let newAnswerForm = document.createElement("form");
+        newAnswerForm.method = "post";
+        newAnswerForm.action = "http://localhost:4042/api/messages/" +messageId;
+        newAnswerForm.innerHTML = `
+            <input name="username" value="`+localStorage.getItem("username")+`">
+            <label>Réponse : </label>
+            <input type="textarea" name="anwser" placeholder="Réponse"></input>
+            <button type="submit">Répondre</button>
+        `;
+
+        newMessageBtnContainer.append(newAnswerForm);
+
+
+
         messagesContainer.innerHTML = '';
             const messageElement = document.createElement("div");
             messageElement.id = message.id;
             messageElement.className = "message";
             messageElement.innerHTML = `
-                <div>
-                    <a>${message.titre}</a>
+                <div class="info">
+                    <a onclick="fetchMessageById('${message.id}')" >${message.titre}</a>
                     <span>${message.username}</span>
                     <span>${new Date(message.date).toLocaleString()}</span>
                 </div>
-                <div>
+                <div class="message">
                     <span>${message.message}</span>
                 </div>
+                
             `;
             messagesContainer.appendChild(messageElement);
     } catch (error) {
