@@ -99,7 +99,7 @@ app.get("/api/messages", async (req, res) => {
             message: message.message,
             date: message.date,
         }));
-        res.json(formattedMessages);
+        res.status(200).json(formattedMessages);
     } catch (error) {
         console.error("Erreur lors de la récupération des messages :", error);
         res.status(500).json({ error: "Erreur interne du serveur" });
@@ -107,13 +107,14 @@ app.get("/api/messages", async (req, res) => {
 });
 
 
-// Display messages selectionner
+
 app.get("/api/messages/:id", async (req, res) => {
     try {
         const messageId = req.params.id;
 
 
         const message = await db.collection("messages").findOne({ _id: new ObjectId(messageId) });
+
 
         if(message) {
             res.status(200).json({
@@ -134,30 +135,53 @@ app.get("/api/messages/:id", async (req, res) => {
     }
 });
 
+app.get("/api/answers/:id", async (req, res) => {
+    const messageId = req.params.id;
+
+    
+        try {
+            const answersFromDb = await db.collection("answers").find({ messageId: messageId }).toArray();
+
+            console.log(answersFromDb);
+
+            const formattedAnswers = answersFromDb.map(message => ({
+                username: message.username,
+                answer: message.answer,
+                date: message.date,
+            }));
+            console.log(formattedAnswers);
+            res.status(200).json(formattedAnswers);
+            
+        } catch (error) {
+            console.error("Erreur lors de la récupération des messages :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
+        }
+});
+
 app.post("/api/messages/:id", async (req, res) => {
     try {
         const messageId = req.params.id;
-        const { username,  anwser } = req.body;
+        const { username,  answer } = req.body;
 
         
 
         const newMessage = {
             messageId,
             username,
-            anwser,
+            answer,
             date: new Date()
         };
 
         
         console.log(newMessage);
 
-        const message = await db.collection("anwers").insertOne(newMessage);
+        const message = await db.collection("answers").insertOne(newMessage);
         if(message) {
             res.status(200).json({
                 success:true,
                 messageId: messageId,
                 username: message.username,
-                anwser: message.anwser,
+                answer: message.answer,
                 date: message.date,
             })
         }else{

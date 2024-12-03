@@ -4,21 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGISTER</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <title>READ IT</title>
+    <script src="../js/script.js" defer></script>
 </head>
 
 <body>
+    <nav>
+        <h1>READ IT</h1>
+        <div>
+            <input type="search" placeholder="Search">
+            <div id="login-logout"></div>
+        </div>
+    </nav>
+    <main>
     <form action="/register" method="post">
         <label for="name">Nom:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" placeholder="Nom" required>
         <label for="username">Nom d'utilisateur:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
+        <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
         <label for="password">Mot de passe:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Ok</button>
-        <button>Cancel</button>
+        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+        <button type="submit">S'enregistrer</button>
     </form>
 </body>
 

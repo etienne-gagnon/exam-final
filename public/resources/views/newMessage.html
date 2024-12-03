@@ -20,13 +20,12 @@
     <main>
         <h1>Nouveau message</h1>
         <form id="addNewMessage" action="/newMessage" method="post">
-            <input id="getUsernameFromStorage" type="" name="username" value="">
+            <input id="getUsernameFromStorage" type="hidden" name="username" value="">
             <label for="titre">Titre:</label>
-            <input name="titre" id="titre" placeholder="titre" value="">
+            <input name="titre" id="titre" placeholder="Titre" value="">
             <label for="message">Message:</label>
-            <textarea name="message" id="message"></textarea>
-            <input type="submit" value="Envoyer">
-            <input type="reset" value="Annuler">
+            <textarea name="message" id="message" placeholder="Votre question"></textarea>
+            <button type="submit">Envoyer</button>
         </form>
 
     </main>

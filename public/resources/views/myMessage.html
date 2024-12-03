@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <title>READ IT</title>
+    <script src="../js/script.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <h1>READ IT</h1>
+        <div>
+            <input type="search" placeholder="Search">
+            <div id="login-logout"></div>
+        </div>
+    </nav>
+    <main>
+        <h1>Mes messages</h1>
+        <form id="myMessageForm">
+            <input id="getUsernameFromStorage" type="hidden" name="username" value="">
+            <label for="titre">Titre:</label>
+            <input name="titre" id="titre" placeholder="titre" value="">
+            <label for="message">Message:</label>
+            <textarea name="message" id="message"></textarea>
+            <button type="button" onclick="fetchMessages()">Afficher les messages</button>
+        </form>
+        <section id="messagesContainer">
+            <!-- Les messages seront affichés ici -->
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                alert('Vous devez être connecté pour voir vos messages.');
+                window.location.href = '/login'; // Redirige vers la page de connexion
+            } else {
+                document.getElementById('getUsernameFromStorage').value = username;
+            }
+        });
+
+        function fetchMessages() {
+            const username = document.getElementById('getUsernameFromStorage').value;
+            fetch(`/api/messages?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    messagesContainer.innerHTML = '';
+                    data.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.innerHTML = `<h3>${message.titre}</h3><p>${message.message}</p>`;
+                        messagesContainer.appendChild(messageElement);
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la récupération des messages:', error));
+        }
+    </script>
+</body>
+
+</html>

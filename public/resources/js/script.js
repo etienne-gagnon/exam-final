@@ -99,17 +99,12 @@ function validateLogin() {
 }   
 
 function newMessageBtn() {
-    validateLogin();
+
 
     window.location.href = "/newMessage";
 }
 
-
-
-
-
-
-// Script message client
+getMessages();
 
 async function getMessages() {
     try {
@@ -152,53 +147,71 @@ async function getMessages() {
 
 async function fetchMessageById(messageId) {
     try {
-        const response = await fetch(`http://localhost:4042/api/messages/${messageId}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        // Récupérer le message
+        const responseMessage = await fetch(`http://localhost:4042/api/messages/${messageId}`);
+        if (!responseMessage.ok) {
+            throw new Error(`HTTP error! Status: ${responseMessage.status}`);
         }
+        const message = await responseMessage.json();
 
-        const message = await response.json();
-
+        // Préparer le conteneur du message
         const messagesContainer = document.getElementById('messagesContainer');
         if (!messagesContainer) {
             console.error('messagesContainer introuvable dans le DOM');
             return;
         }
 
-
         let newAnswerForm = document.createElement("form");
         newAnswerForm.method = "post";
-        newAnswerForm.action = "http://localhost:4042/api/messages/" +messageId;
+        newAnswerForm.action = "http://localhost:4042/api/messages/" + messageId;
         newAnswerForm.innerHTML = `
-            <input name="username" value="`+localStorage.getItem("username")+`">
+            <input name="username" value="` + localStorage.getItem("username") + `">
             <label>Réponse : </label>
-            <input type="textarea" name="anwser" placeholder="Réponse"></input>
+            <input type="textarea" name="answer" placeholder="Réponse"></input>
             <button type="submit">Répondre</button>
         `;
 
         newMessageBtnContainer.append(newAnswerForm);
 
-
-
         messagesContainer.innerHTML = '';
-            const messageElement = document.createElement("div");
-            messageElement.id = message.id;
-            messageElement.className = "message";
-            messageElement.innerHTML = `
+        const messageElement = document.createElement("div");
+        messageElement.id = message.id;
+        messageElement.className = "message";
+        messageElement.innerHTML = `
+            <div class="info">
+                <a onclick="fetchMessageById('${message.id}')">${message.titre}</a>
+                <span>${message.username}</span>
+                <span>${new Date(message.date).toLocaleString()}</span>
+            </div>
+            <div class="message">
+                <span>${message.message}</span>
+            </div>
+        `;
+        messagesContainer.appendChild(messageElement);
+
+        // Récupérer les réponses
+        const responseAnswers = await fetch(`http://localhost:4042/api/answers/${messageId}`);
+        if (!responseAnswers.ok) {
+            throw new Error(`HTTP error! Status: ${responseAnswers.status}`);
+        }
+        const answers = await responseAnswers.json();
+
+        answers.forEach(answer => {
+            const answerElement = document.createElement("div");
+            answerElement.className = "message";
+            answerElement.innerHTML = `
                 <div class="info">
-                    <a onclick="fetchMessageById('${message.id}')" >${message.titre}</a>
-                    <span>${message.username}</span>
-                    <span>${new Date(message.date).toLocaleString()}</span>
+                    <span>${answer.username}</span>
+                    <span>${new Date(answer.date).toLocaleString()}</span>
                 </div>
                 <div class="message">
-                    <span>${message.message}</span>
+                    <span>${answer.answer}</span>
                 </div>
-                
             `;
-            messagesContainer.appendChild(messageElement);
+            messagesContainer.appendChild(answerElement);
+        });
     } catch (error) {
-        console.error('Erreur lors de la récupération des messages :', error);
+        console.error('Erreur lors de la récupération des messages ou des réponses :', error);
     }
 }
 

@@ -29,6 +29,9 @@ app.get("/newMessage", (req, res) => {
     res.sendFile(__dirname + "/public/resources/views/newMessage.html");
 });
 
+app.get("/myMessage", (req, res) => {
+    res.sendFile(__dirname + "/public/resources/views/myMessage.html");
+});
 
 app.post("/validate-login", (req, res) => {
 
