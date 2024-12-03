@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if(newMessageBtnContainer){
             let newMessageBtn = document.createElement("button");
             newMessageBtn.innerText = "New Message";
+            newMessageBtn.id = "newMessageBtn";
             newMessageBtn.setAttribute("onclick", "newMessageBtn()");
     
             newMessageBtnContainer.append(newMessageBtn);
@@ -99,8 +100,6 @@ function validateLogin() {
 }   
 
 function newMessageBtn() {
-
-
     window.location.href = "/newMessage";
 }
 
@@ -122,6 +121,7 @@ async function getMessages() {
             return;
         }
 
+        
         messagesContainer.innerHTML = '';
         
         messages.forEach(message => {
@@ -130,9 +130,11 @@ async function getMessages() {
             messageElement.className = "message";
             messageElement.innerHTML = `
                 <div class="info">
+                    <div>
                     <a onclick="fetchMessageById('${message.id}')" >${message.titre}</a>
                     <span>${message.username}</span>
                     <span>${new Date(message.date).toLocaleString()}</span>
+                    </div>
                 </div>
                 <div class="message">
                     <span>${message.message}</span>
@@ -161,33 +163,46 @@ async function fetchMessageById(messageId) {
             return;
         }
 
-        let newAnswerForm = document.createElement("form");
-        newAnswerForm.method = "post";
-        newAnswerForm.action = "http://localhost:4042/api/messages/" + messageId;
-        newAnswerForm.innerHTML = `
-            <input name="username" value="` + localStorage.getItem("username") + `">
-            <label>Réponse : </label>
-            <input type="textarea" name="answer" placeholder="Réponse"></input>
-            <button type="submit">Répondre</button>
-        `;
 
-        newMessageBtnContainer.append(newAnswerForm);
+        if (localStorage.getItem("validateLogin")) {
+            let newAnswerForm = document.createElement("form");
+            newAnswerForm.id = "newAnswerForm";
+            newAnswerForm.style.display = "none"; // Correction : utilisation d'une affectation
+            newAnswerForm.method = "post";
+            newAnswerForm.action = `http://localhost:4042/api/messages/${messageId}`;
+            newAnswerForm.innerHTML = `
+                <input hidden name="username" value="${localStorage.getItem("username")}">
+                <label>Réponse : </label>
+                <textarea name="answer" placeholder="Réponse"></textarea>
+                <button type="submit">Répondre</button>
+                <a onclick='newResponse()' class='center'>Fermer</a>
+            `;
+        
+            newMessageBtnContainer.append(newAnswerForm); 
+        }
 
         messagesContainer.innerHTML = '';
+
         const messageElement = document.createElement("div");
         messageElement.id = message.id;
         messageElement.className = "message";
+
         messageElement.innerHTML = `
-            <div class="info">
-                <a onclick="fetchMessageById('${message.id}')">${message.titre}</a>
-                <span>${message.username}</span>
-                <span>${new Date(message.date).toLocaleString()}</span>
+            <div class="info active">
+                <div>
+                    <a onclick="fetchMessageById('${message.id}')">${message.titre}</a>
+                    <span>${message.username}</span>
+                    <span>${new Date(message.date).toLocaleString()}</span>
+                </div>
+                ${localStorage.getItem("validateLogin") ? '<button onclick="newResponse()">Répondre</button>' : ''}
             </div>
             <div class="message">
                 <span>${message.message}</span>
             </div>
         `;
+
         messagesContainer.appendChild(messageElement);
+
 
         // Récupérer les réponses
         const responseAnswers = await fetch(`http://localhost:4042/api/answers/${messageId}`);
@@ -216,3 +231,12 @@ async function fetchMessageById(messageId) {
 }
 
 
+function newResponse(){
+    let newAnswerForm = document.getElementById("newAnswerForm");
+
+    if(newAnswerForm.style.display == "none"){
+        newAnswerForm.style.display = "flex";
+    }else{
+        newAnswerForm.style.display = "none";
+    }
+}

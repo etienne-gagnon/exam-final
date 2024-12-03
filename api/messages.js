@@ -91,6 +91,7 @@ app.post("/api/messages", async (req, res) => {
 
 app.get("/api/messages", async (req, res) => {
     try {
+        
         const messagesFromDb = await db.collection("messages").find().toArray();
         const formattedMessages = messagesFromDb.map(message => ({
             id: message._id,
@@ -111,10 +112,7 @@ app.get("/api/messages", async (req, res) => {
 app.get("/api/messages/:id", async (req, res) => {
     try {
         const messageId = req.params.id;
-
-
         const message = await db.collection("messages").findOne({ _id: new ObjectId(messageId) });
-
 
         if(message) {
             res.status(200).json({
