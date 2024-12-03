@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIN</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <title>READ IT</title>
+    <script src="../js/script.js" defer></script>
 </head>
+
 <body>
-    <form action="/login" method="POST">
-        <label for="username">Nom d'utilisateur:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Mot de passe:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Ok</button>
-        <button>Cancel</button>
-    </form>
+    <nav>
+        <h1>READ IT</h1>
+        <div>
+            <input type="search" placeholder="Search">
+            <div id="login-logout"></div>
+        </div>
+    </nav>
+    <main>
+        <form action="/login" method="POST">
+            <label for="username">Nom d'utilisateur:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="password">Mot de passe:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+            <button type="submit">Ok</button>
+            <button>Cancel</button>
+        </form>
+    </main>
+
 </body>
+
 </html>

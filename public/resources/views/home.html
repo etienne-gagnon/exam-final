@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,22 @@
     <title>READ IT</title>
     <script src="../js/script.js" defer></script>
 </head>
+
 <body>
     <nav>
-        <h1>Read It</h1>
-        <input type="search">
-        <span id="display-name"></span>
-        <a id="login-logout" href="/login">Login</a>
-        <a href="/register">Register</a>
+        <h1>READ IT</h1>
+        <div>
+            <input type="search" placeholder="Search">
+            <div id="login-logout"></div>
+        </div>
     </nav>
+    <main>
+        <h1>Messages</h1>
+        <div id="newMessageBtnContainer"></div>
+        <div id="messagesContainer">
+        </div>
+    </main>
+
 </body>
+
 </html>

@@ -4,13 +4,15 @@ const bcrypt = require("bcrypt");
 let app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+const cors = require('cors');
+app.use(cors({
+    origin: 'http://localhost:4040', // Autorise uniquement cette origine
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
+}));
 
 app.listen(4041, () => {
     console.log("Serveur api - users : http://localhost:4041/");
 });
-
-
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -39,6 +41,22 @@ const connectToDatabase = async () => {
 connectToDatabase();
 
 
+app.post("/api/users/validate-login", async (req, res) => {
+    const { name, username, activePage } = req.body;
+
+    try {
+        const user = await db.collection("users").findOne({ $and: [{ name: name }, { username: username }] });
+
+        if (user) {
+            res.status(200).json({ success: true, activePage: activePage, message: "Validation du login réussie", user: { name: name, username: username } });
+        } else {
+            res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Erreur interne du serveur au moment de la connexion" });
+    }
+});
+
 app.post("/api/users/login", async (req, res) => {
     const { username, password } = req.body;
 
@@ -48,7 +66,7 @@ app.post("/api/users/login", async (req, res) => {
         if (user) {
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch) {
-                res.json({ success: true, message: "Connexion réussie", user: { id: user._id, name: user.name, username: user.username } });
+                res.json({ success: true, activePage: "/", message: "Connexion réussie", user: { id: user._id, name: user.name, username: user.username } });
             } else {
                 res.status(401).json({ success: false, message: "Mot de passe incorrect" });
             }
@@ -66,7 +84,7 @@ app.post("/api/users/register", async (req, res) => {
     const userExists = await db.collection("users").findOne({ username });
 
     if (userExists) {
-        res.status(409).json({ success: false, message: "L'utilisateur existe déjà" });
+        res.status(409).json({ success: false, activePage: "/", message: "L'utilisateur existe déjà" });
     } else {
         const hashedPassword = await bcrypt.hash(password, 10);
 
