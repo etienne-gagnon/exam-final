@@ -192,6 +192,24 @@ app.post("/api/messages/:id", async (req, res) => {
     }
 });
 
+
+
+app.get("/api/mymessages/:username", async (req, res) => {
+    const usernameId = req.params.username;
+
+try {
+    const messagesFromDb = await db.collection("messages").find({ username: usernameId }).toArray();
+    res.status(200).json({ success: true, formattedMessages: messagesFromDb.map(message => ({
+        titre: message.titre,
+        username: message.username,
+        message: message.message,
+        date: message.date,
+    })) });
+} catch (error) {
+    console.error("Erreur lors de la récupération des messages :", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
+}
+});
 // moddifier messages avec le admin seulement
 
 // Supprimer messages avec le admin seulement

@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="../css/style.css">
     <title>READ IT</title>
     <script src="../js/script.js" defer></script>
+    <script src="../js/getMyMessages.js" defer></script>
+
 </head>
 
 <body>
@@ -19,46 +21,9 @@
     </nav>
     <main>
         <h1>Mes messages</h1>
-        <section id="myMessagesContainer">
-            <!-- Les messages seront affichés ici -->
-        </section>
+        <div id="messagesContainer">
+        </div>
     </main>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const username = localStorage.getItem('username');
-            console.log('Nom d\'utilisateur récupéré:', username);
-            if (!username) {
-                alert('Vous devez être connecté pour voir vos messages.');
-                window.location.href = '/login'; // Redirige vers la page de connexion
-            } else {
-                fetchMessages(username);
-            }
-        });
-
-        function fetchMessages(username) {
-            fetch(`/api/messages?username=${username}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur réseau lors de la récupération des messages');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const messagesContainer = document.getElementById('myMessagesContainer');
-                    messagesContainer.innerHTML = '';
-                    if (data.length === 0) {
-                        messagesContainer.innerHTML = '<p>Aucun message trouvé.</p>';
-                    } else {
-                        data.forEach(message => {
-                            const messageElement = document.createElement('div');
-                            messageElement.innerHTML = `<h3>${message.titre}</h3><p>${message.message}</p>`;
-                            messagesContainer.appendChild(messageElement);
-                        });
-                    }
-                })
-                .catch(error => console.error('Erreur lors de la récupération des messages:', error));
-        }
-    </script>
 </body>
 
 </html>
