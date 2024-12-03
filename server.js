@@ -2,7 +2,7 @@ const express = require("express");
 
 let app = express();
 app.use(express.json());
-app.use(express.urlencoded( {extended: true} ));
+app.use(express.urlencoded({ extended: true }));
 
 
 app.listen(4040, () => {
@@ -26,9 +26,10 @@ app.get("/register", (req, res) => {
 
 
 
+
 app.post("/login", (req, res) => {
     console.log("Appel de login");
-    
+
     const { username, password } = req.body;
 
     fetch('http://localhost:4041/api/users/login', {
@@ -41,25 +42,26 @@ app.post("/login", (req, res) => {
             password: password
         }),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erreur : ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Réponse du serveur :', data);
-        res.json(data);
-    })
-    .catch(error => {
-        console.error('Erreur lors de la requête :', error);
-        res.status(500).json({ error: 'Erreur lors de la connexion' });
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(data.message);
+                res.status(200).redirect("/?name=" + data.user.name + "&username=" + data.user.username);
+            } else {
+                console.log(data.message);
+                res.status(400).json({ success: false, message: data.message });
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la requête :', error);
+            res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+        });
 });
+
 
 app.post("/register", (req, res) => {
     console.log("Appel de register");
-    
+
     const { name, username, password } = req.body;
 
     fetch('http://localhost:4041/api/users/register', {
@@ -73,18 +75,18 @@ app.post("/register", (req, res) => {
             password: password
         }),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erreur : ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Réponse du serveur :', data);
-        res.json(data);
+        if (data.success) {
+            console.log(data.message);
+            res.status(200).redirect("/?name=" + data.user.name + "&username=" + data.user.username);
+        } else {
+            console.log(data.message);
+            res.status(400).json({ error: data.message });
+        }
     })
     .catch(error => {
         console.error('Erreur lors de la requête :', error);
-        res.status(500).json({ error: 'Erreur lors de la connexion' });
+        res.status(500).json({ error: 'Erreur interne du serveur' });
     });
 });

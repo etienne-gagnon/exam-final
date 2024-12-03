@@ -39,30 +39,35 @@ const connectToDatabase = async () => {
 connectToDatabase();
 
 
-
-app.post("/api/users/login", (req, res) => {
-
+app.post("/api/users/login", async (req, res) => {
     const { username, password } = req.body;
 
-    // connexion a la bd
+    try {
+        const user = await db.collection("users").findOne({ username: username });
 
-    // vérifier si user existe
-    // Renvoyer la réponse
+        if (user) {
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (isMatch) {
+                res.json({ success: true, message: "Connexion réussie", user: { id: user._id, name: user.name, username: user.username } });
+            } else {
+                res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+            }
+        } else {
+            res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Erreur interne du serveur au moment de la connexion" });
+    }
 });
 
-
 app.post("/api/users/register", async (req, res) => {
-
     const { name, username, password } = req.body;
 
+    const userExists = await db.collection("users").findOne({ username });
 
-    try {
-        const userExists = await db.collection("users").findOne({ username });
-
-        if (userExists) {
-            return res.status(400).json({ error: "User already exists" });
-        }
-
+    if (userExists) {
+        res.status(409).json({ success: false, message: "L'utilisateur existe déjà" });
+    } else {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = {
@@ -72,16 +77,12 @@ app.post("/api/users/register", async (req, res) => {
             profile: 'user'
         }
 
-        const result = await db.collection("users").insertOne(newUser);
-
-        res.status(201).json({
-            success: true,
-            message: "Utilisateur enregistré avec succès",
-            user: { id: result.insertedId, name: name, username: username }
-        });
-    } catch (error) {
-        console.error("Erreur lors de l'enregistrement:", error);
-        res.status(500).json({ success: false, message: "Erreur interne du serveur" });
+        try {
+            const result = await db.collection("users").insertOne(newUser);
+            res.status(201).json({ success: true, message: "Utilisateur enregistré avec succès", user: { id: result.insertedId, name: name, username: username } });
+        } catch (error) {
+            res.status(500).json({ success: false, message: "Erreur interne du serveur au moment de l'enregistrement" });
+        }
     }
 });
 
